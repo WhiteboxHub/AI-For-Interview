@@ -6,3 +6,4 @@ chroma_db/
 cache/
 generator.py/
 comet.py/
+RAG.py/
