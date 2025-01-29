@@ -1,0 +1,8 @@
+**/__pycache__/
+*.pyc
+*.db
+*.env
+chroma_db/
+cache/
+generator.py/
+comet.py/

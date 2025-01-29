@@ -1,0 +1,11 @@
+langchain
+langchain_community
+langchain_core
+langchain_mistralai
+langchain_text_splitters
+langchain_chroma
+langchain_groq
+huggingface_hub
+pypdf
+chromadb
+groq
