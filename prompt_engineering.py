@@ -2,7 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 class PromptEngineering:
     @staticmethod
-    def get_interview_prompt():
+    def get_interview_prompt12():
         return ChatPromptTemplate.from_messages([
             ("system", """You are an AI/ML Engineer.For every question, provide two types of answers: 
                 For every question, provide two types of answers:
@@ -18,8 +18,15 @@ class PromptEngineering:
                 """),
             ("human", "{question}")
         ])
-    
-    
+    @staticmethod
+    def get_interview_prompt():
+        return ChatPromptTemplate.from_messages([
+            ("system", """for every question asked give online one line answers
+                
+               
+                """),
+            ("human", "{question}")
+        ])
 
     def get_interview_prompt_1():
             return ChatPromptTemplate.from_messages([
@@ -37,6 +44,16 @@ class PromptEngineering:
                     """),
                 ("human", "{question}")
             ])
+    def get_interview_prompt_2():
+            return ChatPromptTemplate.from_messages([
+                ("system", """You are a helpful AI assistant designed to assist AI/ML engineers in interview preparation. 
+                    For every question,:
+                    1. A **short answer**: A concise and direct response to the question.
+                    
+                    """),
+                ("human", "{question}")
+            ])
+    
 
 
 

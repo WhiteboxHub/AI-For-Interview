@@ -15,6 +15,6 @@ class LLMPipeline:
 
 if __name__ == "__main__":
     llm_pipeline = LLMPipeline()
-    response = llm_pipeline.ask_question("What are the benefits of deep learning?")
+    response = llm_pipeline.ask_question("What are the games in ps2")
     structure_output = StrOutputParser()
     print(structure_output.invoke(response))
