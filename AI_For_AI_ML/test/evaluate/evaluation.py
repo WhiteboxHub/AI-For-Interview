@@ -1,25 +1,32 @@
-from src.generation.llm_selector import LLMSelector
-from src.prompt_templates import PromptEngineering
-from langchain_core.output_parsers import StrOutputParser
-from sentence_transformers import SentenceTransformer, util
-from nltk.translate.bleu_score import sentence_bleu
-from rouge import Rouge
-import ragas
-from ragas import evaluate
-from ragas.metrics import faithfulness, answer_relevancy, answer_correctness
 
-from dataset import inputs , outputs
-
+import json
 from langchain_core.messages import AIMessage
+from sentence_transformers import SentenceTransformer
+from rouge import Rouge
+from src.generation import llm_pipeline
+from src.generation import llm_selector
+
+from nltk.translate.bleu_score import sentence_bleu
+from sentence_transformers import util
+from src.prompt_templates import prompt_engineering
+
+# dataset.py
+import json
+
+# Load the dataset from a JSON file
+with open("/Users/innovapathinc/Desktop/saturday_night /AI_For_Interview/src/generation/dataset.py", "r") as file:
+    QA_dataset = json.load(file)
+
+# Assuming you have the dataset loaded from the JSON file
 
 # LLM pipeline to generate answers
 class LLMPipeline:
-    def __init__(self, model_name="llama3-70b-8192", provider="groq"):
-        self.llm_selector = LLMSelector(model_name, provider)
-        self.prompt_engineering = PromptEngineering()
+    def __init__(self):
+        self.llm_selector = llm_selector.LLMSelector()
+        self.prompt_engineering = prompt_engineering.PromptEngineering()
 
     def ask_question(self, question):
-        prompt_template = self.prompt_engineering.get_interview_prompt()
+        prompt_template = self.prompt_engineering.get_interview_prompt_1()
         formatted_prompt = prompt_template.format(question=question)
         response = self.llm_selector.generate_response(formatted_prompt)
         return response
@@ -58,6 +65,7 @@ class ResponseEvaluator:
             "ROUGE-L": round(rouge_scores["rouge-l"]["f"], 4),
             "Cosine Similarity": round(cosine_similarity, 4)
         }
+
     def evaluate_with_ragas(self, question, generated, ground_truth):
         if isinstance(generated, str):
             generated_text = generated
@@ -72,31 +80,23 @@ class ResponseEvaluator:
             "response": generated_text
         }]
 
-        results = evaluate(dataset, [faithfulness, answer_relevancy, answer_correctness])
-
-        return {
-            "Faithfulness": round(results["faithfulness"], 4),
-            "Answer Relevancy": round(results["answer_relevancy"], 4),
-            "Answer Correctness": round(results["answer_correctness"], 4)
-        }
-
-
 # Main function to generate and evaluate responses
 if __name__ == "__main__":
     llm_pipeline = LLMPipeline()
     evaluator = ResponseEvaluator()
     evaluation_results = []
 
-    for i, question in enumerate(inputs):
-        reference_answer = outputs[i]
-
+    # Iterate through the dataset
+    for entry in QA_dataset["QA_dataset"]:
+        question = entry["question"]
+        reference_answer = entry["answer"]["detailed"]  # Assuming you want the "detailed" answer
+        
         # Generate response from LLM pipeline
         generated_answer = llm_pipeline.ask_question(question)
 
         # Evaluate the generated response
         scores = evaluator.evaluate_response(generated_answer, reference_answer)
 
-        
         # Append results
         evaluation_results.append({
             "Question": question,

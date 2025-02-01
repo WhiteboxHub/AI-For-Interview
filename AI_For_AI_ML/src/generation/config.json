@@ -1,0 +1,22 @@
+[
+    {
+    "model_name": "llama3-70b-8192",
+    "provider": "groq"
+},
+{
+    "model_name": "gemma2-9b-it",
+    "provider": "groq"
+},
+{
+    "model_name": "mixtral-8x7b-32768",
+    "provider": "groq"
+},
+{
+    "model_name": "whisper-large-v3-turbo",
+    "provider": "groq"
+},
+{
+    "model_name": "distil-whisper-large-v3-en",
+    "provider": "groq"
+}
+]
