@@ -1,11 +1,15 @@
 import os
+import json
 from langchain_groq import ChatGroq
 from langchain_mistralai import ChatMistralAI
 from langchain_core.output_parsers import StrOutputParser
+
 class LLMSelector:
-    def __init__(self, model_name, provider):
-        self.model_name = model_name
-        self.provider = provider
+    def __init__(self, config_file="config.json"):
+        with open(config_file, "r") as f:
+            config = json.load(f)
+        self.model_name = config.get("model_name")
+        self.provider = config.get("provider")
         self.llm = self.initialize_llm()
 
     def initialize_llm(self):
@@ -17,5 +21,4 @@ class LLMSelector:
             raise ValueError("Unsupported LLM provider. Choose 'groq' or 'mistral'.")
 
     def generate_response(self, prompt):
-        
         return self.llm.invoke(prompt)
