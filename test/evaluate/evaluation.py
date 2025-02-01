@@ -1,5 +1,5 @@
-from llm_selector import LLMSelector
-from prompt_engineering import PromptEngineering
+from src.generation.llm_selector import LLMSelector
+from src.prompt_templates import PromptEngineering
 from langchain_core.output_parsers import StrOutputParser
 from sentence_transformers import SentenceTransformer, util
 from nltk.translate.bleu_score import sentence_bleu
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     # Print the evaluation results
     for result in evaluation_results:
         print(f"Question: {result['Question']}")
-        print(f"Generated Response: {result['Generated Response']}")
-        print(f"Reference Response: {result['Reference Response']}")
+        # print(f"Generated Response: {result['Generated Response']}")
+        # print(f"Reference Response: {result['Reference Response']}")
         print(f"Evaluation Scores: {result['Evaluation Scores']}")
         print("="*50)

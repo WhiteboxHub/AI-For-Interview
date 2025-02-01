@@ -1,4 +1,4 @@
-
+# List of inputs (questions)
 inputs = [
     "What embedding model did you use for your retriever, and how did you optimize it?",
     "What conclusion did you make about which retriever is good or bad, and how?",
@@ -37,10 +37,11 @@ inputs = [
     "Could you discuss the evaluation metrics you use for summarization tasks, such as BLEU and ROUGE?"
 ]
 
+# List of corresponding ground truth outputs
 outputs = [
-    "Used models like OpenAI embeddings or Sentence-BERT. Optimized by fine-tuning on domain-specific data and adjusting hyperparameters like batch size and learning rate.",
+    "Used models like sentence tranformers from hugging face  or Sentence-BERT. Optimized by fine-tuning on domain-specific data and adjusting hyperparameters like batch size and learning rate.",
     "Evaluated retrievers based on recall, precision, and relevance. Good retrievers consistently fetch accurate and contextually relevant documents.",
-    "Collected ground truth by manually annotating datasets or using labeled datasets like MS MARCO or Natural Questions.",
+    "Collected ground truth by manually annotating datasets or using labeled datasets like  Natural Questions.",
     "Metrics: Recall@K, Precision@K, Mean Reciprocal Rank (MRR), and Normalized Discounted Cumulative Gain (NDCG).",
     "Measured precision by checking the proportion of relevant documents retrieved. Recall by evaluating how many relevant documents were retrieved out of all possible. Relevance was judged by human annotators or predefined criteria.",
     "Full fine-tuning updates all model parameters, while parameter-efficient fine-tuning (e.g., LoRA) updates only a small subset, saving compute and memory.",
@@ -74,3 +75,8 @@ outputs = [
     "Optimized by using Bayesian optimization, grid search, or random search to find the best hyperparameters.",
     "Used BLEU for n-gram overlap and ROUGE for recall-oriented evaluation of summarization tasks."
 ]
+
+# Create the RAGAS dataset format
+dataset = [{"question": q, "ground_truth": gt, "response": gt} for q, gt in zip(inputs, outputs)]
+
+# Now the dataset is structured to be used with RAGAS for evaluation

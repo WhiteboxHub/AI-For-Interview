@@ -5,7 +5,7 @@ from langchain_mistralai import ChatMistralAI
 from langchain_core.output_parsers import StrOutputParser
 
 class LLMSelector:
-    def __init__(self, config_file="config.json"):
+    def __init__(self, config_file="/Users/innovapathinc/Desktop/saturday_night /AI-For-Interview/config.json"):
         with open(config_file, "r") as f:
             config = json.load(f)
         self.model_name = config.get("model_name")
