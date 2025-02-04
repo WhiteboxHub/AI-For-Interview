@@ -1,14 +1,17 @@
-
 import os
 import json
 from langchain_groq import ChatGroq
 from langchain_mistralai import ChatMistralAI
 from opik.integrations.langchain import OpikTracer
+from dotenv import load_dotenv
 
+load_dotenv()
 
-os.environ["OPIK_API_KEY"] = "PJ8wuOm0zqgE2xpF9bs8TTV0K"
-os.environ["OPIK_WORKSPACE"] = "saiteja001r"
-os.environ["OPIK_PROJECT_NAME"] = "WBL_ChatAPP"
+OPIK_API_KEY = os.getenv("OPIK_API_KEY") 
+OPIK_WORKSPACE = os.getenv("OPIK_WORKSPACE") 
+OPIK_PROJECT_NAME = os.getenv("OPIK_PROJECT_NAME") 
+API_KEY = os.getenv("groq_api_key")  
+
 opik_tracer = OpikTracer()
 
 class LLMSelector:
@@ -33,7 +36,7 @@ class LLMSelector:
 
         if provider == "groq":
             
-            return ChatGroq(model= "whisper-large-v3-turbo",api_key="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", callbacks=[opik_tracer])
+            return ChatGroq(model= "mixtral-8x7b-32768",api_key=API_KEY, callbacks=[opik_tracer])
         elif provider == "mistral":
             mistral_api_key = os.getenv("MISTRAL_API_KEY")
             if not mistral_api_key:

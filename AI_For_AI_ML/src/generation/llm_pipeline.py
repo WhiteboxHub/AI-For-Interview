@@ -83,7 +83,7 @@ if __name__ == "__main__":
     
 
         # Get the response from the chatbot
-    response = llm_pipeline.ask_question("what is RAG?")
+    response = llm_pipeline.ask_question("what is genaration evaluation?")
 
         # Parse and print the structured output
     structure_output = StrOutputParser()

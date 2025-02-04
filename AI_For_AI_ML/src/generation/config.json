@@ -10,13 +10,5 @@
 {
     "model_name": "mixtral-8x7b-32768",
     "provider": "groq"
-},
-{
-    "model_name": "whisper-large-v3-turbo",
-    "provider": "groq"
-},
-{
-    "model_name": "distil-whisper-large-v3-en",
-    "provider": "groq"
 }
 ]
