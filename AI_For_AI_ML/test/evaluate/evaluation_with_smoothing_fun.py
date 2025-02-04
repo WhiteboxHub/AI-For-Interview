@@ -4,15 +4,11 @@ import json
 from langchain_core.messages import AIMessage
 from sentence_transformers import SentenceTransformer
 from rouge import Rouge
-# from src.generation.llm_pipeline import LLMPipeline
-# from src.generation import llm_selector
-
-from nltk.translate.bleu_score import sentence_bleu
+import re
+from nltk.translate.bleu_score import sentence_bleu,SmoothingFunction
 from sentence_transformers import util
-# from src.prompt_templates import prompt_engineering
 import os 
 import sys 
-# dataset.py
 import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"../..")))
 from src.generation.llm_selector import  LLMSelector 
@@ -42,6 +38,15 @@ class ResponseEvaluator:
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.rouge = Rouge()
 
+    def preprocess_text(self, text):
+        """ Lowercase text, remove punctuation & extra spaces """
+        text = text.lower()
+        text = re.sub(r"[^\w\s]", "", text)  # Remove punctuation
+        text = re.sub(r"\s+", " ", text).strip()  # Remove extra spaces
+        return text
+    
+
+
     def evaluate_response(self, generated, ground_truth):
         # Print the type of generated response for debugging
         print(f"Type of generated: {type(generated)}")
@@ -53,9 +58,16 @@ class ResponseEvaluator:
             generated_text = generated.content  # Access the 'content' attribute
         else:
             raise ValueError("Generated response does not have a valid text attribute.")
+        # Preprocess both responses
+        generated_text = self.preprocess_text(generated_text)
+        ground_truth = self.preprocess_text(ground_truth)
 
-        # BLEU Score
-        bleu_score = sentence_bleu([ground_truth.split()], generated_text.split())
+
+        # BLEU Score with smoothing
+        reference = [ground_truth.split()]
+        candidate = generated_text.split()
+        smooth_fn = SmoothingFunction().method1  # Apply smoothing to handle short responses
+        bleu_score = sentence_bleu(reference, candidate, smoothing_function=smooth_fn)
 
         # ROUGE Score
         rouge_scores = self.rouge.get_scores(generated_text, ground_truth, avg=True)

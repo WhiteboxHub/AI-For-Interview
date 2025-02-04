@@ -12,7 +12,8 @@ from sentence_transformers import util
 # from src.prompt_templates import prompt_engineering
 import os 
 import sys 
-# dataset.py
+from ragas.metrics import answer_relevancy, AnswerCorrectness
+from ragas import evaluate
 import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"../..")))
 from src.generation.llm_selector import  LLMSelector 
@@ -71,7 +72,10 @@ class ResponseEvaluator:
             "Cosine Similarity": round(cosine_similarity, 4)
         }
 
-    def evaluate_with_ragas(self, question, generated, ground_truth):
+
+    def evaluate_ragas(self, question, generated, ground_truth):
+        """ Evaluate generated responses using RAGAS metrics. """
+        
         if isinstance(generated, str):
             generated_text = generated
         elif isinstance(generated, AIMessage):
@@ -85,35 +89,44 @@ class ResponseEvaluator:
             "response": generated_text
         }]
 
-# Main function to generate and evaluate responses
+        scores = {
+            "Relevance": evaluate(dataset,metrics=[answer_relevancy]),
+            "Answer Correctness": AnswerCorrectness.evaluate(dataset)        }
+
+        return {key: round(value, 4) for key, value in scores.items()}
+
+  
+
 if __name__ == "__main__":
     llm_pipeline = LLMPipeline()
     evaluator = ResponseEvaluator()
     evaluation_results = []
 
-    # Iterate through the dataset
     for entry in QA_dataset["QA_dataset"]:
         question = entry["question"]
-        reference_answer = entry["answer"]["detailed"]  # Assuming you want the "detailed" answer
+        reference_answer = entry["answer"]["detailed"]  # Reference ground truth
         
-        # Generate response from LLM pipeline
+        # Generate response
         generated_answer = llm_pipeline.ask_question(question)
 
-        # Evaluate the generated response
-        scores = evaluator.evaluate_response(generated_answer, reference_answer)
+        # Evaluate using BLEU, ROUGE, Cosine Similarity
+        scores_traditional = evaluator.evaluate_response(generated_answer, reference_answer)
 
-        # Append results
+        # Evaluate using RAGAS
+        scores_ragas = evaluator.evaluate_ragas(question, generated_answer, reference_answer)
+
+        # Store results
         evaluation_results.append({
             "Question": question,
             "Generated Response": generated_answer,
             "Reference Response": reference_answer,
-            "Evaluation Scores": scores
+            "Traditional Scores": scores_traditional,
+            "RAGAS Scores": scores_ragas
         })
 
     # Print the evaluation results
     for result in evaluation_results:
         print(f"Question: {result['Question']}")
-        # print(f"Generated Response: {result['Generated Response']}")
-        # print(f"Reference Response: {result['Reference Response']}")
-        print(f"Evaluation Scores: {result['Evaluation Scores']}")
+        print(f"Evaluation Scores: {result['Traditional Scores']}")
+        print(f"RAGAS Scores: {result['RAGAS Scores']}")
         print("="*50)

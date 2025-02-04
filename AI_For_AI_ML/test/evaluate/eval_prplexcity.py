@@ -4,12 +4,11 @@ import json
 from langchain_core.messages import AIMessage
 from sentence_transformers import SentenceTransformer
 from rouge import Rouge
-# from src.generation.llm_pipeline import LLMPipeline
-# from src.generation import llm_selector
-
+from transformers import  GPT2LMHeadModel, GPT2Tokenizer
 from nltk.translate.bleu_score import sentence_bleu
 from sentence_transformers import util
 # from src.prompt_templates import prompt_engineering
+import torch
 import os 
 import sys 
 # dataset.py
@@ -18,11 +17,21 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),"../.."))
 from src.generation.llm_selector import  LLMSelector 
 from src.prompt_templates.prompt_engineering import PromptEngineering 
 
+# Load GPT2 model and tokenizer for perplexity calculation
+gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
+gpt2_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
 # Load the dataset from a JSON file
 with open("/Users/innovapathinc/Desktop/saturday_night /AI_For_Interview/AI_For_AI_ML/test/evaluate/dataset.py", "r") as file:
     QA_dataset = json.load(file)
 
 # Assuming you have the dataset loaded from the JSON file
+def compute_perplexity(text):
+    """Compute perplexity of a given text using GPT2."""
+    encodings = gpt2_tokenizer(text, return_tensors="pt")
+    with torch.no_grad():
+        loss = gpt2_model(**encodings, labels=encodings["input_ids"]).loss
+    return torch.exp(loss).item()
 
 # LLM pipeline to generate answers
 class LLMPipeline:
@@ -65,10 +74,14 @@ class ResponseEvaluator:
         ref_embedding = self.model.encode(ground_truth, convert_to_tensor=True)
         cosine_similarity = util.pytorch_cos_sim(gen_embedding, ref_embedding).item()
 
+        # Perplexity
+        perplexity = compute_perplexity(generated_text)
+
         return {
             "BLEU": round(bleu_score, 4),
             "ROUGE-L": round(rouge_scores["rouge-l"]["f"], 4),
-            "Cosine Similarity": round(cosine_similarity, 4)
+            "Cosine Similarity": round(cosine_similarity, 4),
+            "Perplexity": round(perplexity, 4)
         }
 
     def evaluate_with_ragas(self, question, generated, ground_truth):
@@ -103,7 +116,7 @@ if __name__ == "__main__":
         scores = evaluator.evaluate_response(generated_answer, reference_answer)
 
         # Append results
-        evaluation_results.append({
+        evaluation_results.append({  
             "Question": question,
             "Generated Response": generated_answer,
             "Reference Response": reference_answer,
