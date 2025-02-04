@@ -1,12 +1,21 @@
-
 import os
 import json
 from langchain_groq import ChatGroq
 from langchain_mistralai import ChatMistralAI
-from langchain_core.output_parsers import StrOutputParser
+from opik.integrations.langchain import OpikTracer
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OPIK_API_KEY = os.getenv("OPIK_API_KEY") 
+OPIK_WORKSPACE = os.getenv("OPIK_WORKSPACE") 
+OPIK_PROJECT_NAME = os.getenv("OPIK_PROJECT_NAME") 
+API_KEY = os.getenv("groq_api_key")  
+
+opik_tracer = OpikTracer()
 
 class LLMSelector:
-    def __init__(self, config_file="/Users/innovapathinc/Desktop/saturday_night /AI_For_Interview/AI_For_AI_ML/src/generation/config.json"):
+    def __init__(self, config_file=r"C:\Users\dhira\Desktop\v_0_3\AI-For-Interview\AI_For_AI_ML\src\generation\config.json"):
         try:
             with open(config_file, "r") as f:
                 self.config = json.load(f)  # Load the list of model configurations
@@ -27,7 +36,7 @@ class LLMSelector:
 
         if provider == "groq":
             
-            return ChatGroq(model= "llama3-70b-8192",api_key="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")
+            return ChatGroq(model= "mixtral-8x7b-32768",api_key=API_KEY, callbacks=[opik_tracer])
         elif provider == "mistral":
             mistral_api_key = os.getenv("MISTRAL_API_KEY")
             if not mistral_api_key:
