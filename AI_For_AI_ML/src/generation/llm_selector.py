@@ -21,13 +21,13 @@ class LLMSelector:
             raise ValueError("Invalid JSON format in the config file.")
 
     def initialize_llm(self, model_config):
-        model_name = model_config.get("llama3-70b-8192")
+        model_name = model_config.get("model_name")
         provider = model_config.get("provider")
-        
+        grog_api_key="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"
 
         if provider == "groq":
             
-            return ChatGroq(model= "llama3-70b-8192",api_key="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")
+            return ChatGroq(model= "llama3-70b-8192",api_key=grog_api_key)
         elif provider == "mistral":
             mistral_api_key = os.getenv("MISTRAL_API_KEY")
             if not mistral_api_key:
